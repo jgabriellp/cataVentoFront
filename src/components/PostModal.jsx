@@ -150,7 +150,6 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
             onClick={handleClose}
             style={{
               marginBottom: "auto",
-              marginBottom: "auto",
               position: "absolute",
               right: "6px",
               borderRadius: "50%",

@@ -53,7 +53,18 @@ const LoggedNavbar = () => {
                   marginRight: "15px",
                 }}
               >
-                Feed
+                Relatos
+              </Nav.Link>
+
+              <Nav.Link
+                href="/grupos"
+                style={{
+                  color: "whitesmoke",
+                  fontWeight: 500,
+                  marginRight: "15px",
+                }}
+              >
+                Grupos
               </Nav.Link>
 
               <Nav.Link

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Container,
   Row,
@@ -23,7 +23,6 @@ const Feed = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [posts, setPosts] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(5);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -35,6 +34,17 @@ const Feed = () => {
   const [likesModalPost, setLikesModalPost] = useState(null); // post selecionado para exibir curtidas
   const [showLikesModal, setShowLikesModal] = useState(false);
   const [likedPosts, setLikedPosts] = useState([]); // guarda os posts curtidos pelo usuário
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+  const [showButton, setShowButton] = useState(true);
+
+  const textRef = useRef(null);
+
+  const handleInput = () => {
+    const el = textRef.current;
+    el.style.height = "auto"; // reseta altura
+    el.style.height = el.scrollHeight + "px"; // ajusta para o conteúdo
+  };
 
   useEffect(() => {
     if (posts.length > 0) {
@@ -44,6 +54,15 @@ const Feed = () => {
       setLikedPosts(liked);
     }
   }, [posts, user.id]);
+
+  useEffect(() => {
+    setPosts([]); // limpa os posts antigos
+    setCurrentPage(1); // reseta paginação
+
+    if (selectedGroup) {
+      fetchPosts(1); // carrega a primeira página do novo grupo
+    }
+  }, [selectedGroup]);
 
   const handleLikePost = async (postId) => {
     try {
@@ -120,14 +139,22 @@ const Feed = () => {
   };
 
   // Buscar posts do grupo selecionado
-  const fetchPosts = async () => {
+  const fetchPosts = async (page = 1) => {
     if (!selectedGroup) return;
     try {
-      // 1️⃣ Buscar posts do grupo selecionado
-      const response = await api.get(`/api/Post/group/${selectedGroup}`);
+      const response = await api.get(
+        `/api/Post/group/${selectedGroup}?pageNumber=${page}&pageSize=${pageSize}`
+      );
+
       const postsData = response.data;
 
-      // 2️⃣ Para cada post, buscar group e creator
+      if (postsData.length === 0) {
+        setShowButton(false);
+        return; // evita concatenar nada
+      } else {
+        setShowButton(true); // ainda há posts, mantém o botão
+      }
+
       const enrichedPosts = await Promise.all(
         postsData.map(async (post) => {
           try {
@@ -150,20 +177,25 @@ const Feed = () => {
           } catch (innerErr) {
             console.error("Erro ao buscar detalhes do post:", innerErr);
             return {
-              id: post.postId,
-              conteudo: post.content,
-              data: new Date(post.date).toLocaleDateString("pt-BR"),
-              grupo: "Grupo desconhecido",
-              autor: "Usuário desconhecido",
+              postId: post.postId,
+              content: post.content,
+              date: new Date(post.date).toLocaleDateString("pt-BR"),
+              groupName: "Grupo desconhecido",
+              authorName: "Usuário desconhecido",
               imageUrl: post.imageUrl,
             };
           }
         })
       );
 
-      // 3️⃣ Atualiza o estado com os posts completos
-      setPosts(enrichedPosts);
-      console.log("Posts carregados com detalhes:", enrichedPosts);
+      // 🔹 Se for a primeira página, substitui; senão, adiciona
+      if (page === 1) {
+        setPosts(enrichedPosts);
+      } else {
+        setPosts((prev) => [...prev, ...enrichedPosts]);
+      }
+
+      setCurrentPage(page);
     } catch (error) {
       console.error("Erro ao carregar posts:", error);
     }
@@ -343,12 +375,18 @@ const Feed = () => {
                             : "Selecione um grupo antes de postar"
                         }
                         value={novoPost}
-                        onChange={(e) => setNovoPost(e.target.value)}
+                        onChange={(e) => {
+                          setNovoPost(e.target.value);
+                          handleInput();
+                        }}
                         disabled={!selectedGroup}
+                        ref={textRef}
                         style={{
                           borderRadius: "15px",
                           resize: "none",
-                          marginBottom: "10px",
+                          overflow: "hidden", // impede scroll interno
+                          minHeight: "60px", // altura mínima bonita
+                          lineHeight: "1.5",
                         }}
                       />
                     </Form.Group>
@@ -382,7 +420,7 @@ const Feed = () => {
                         id="fileInput"
                         type="file"
                         accept="image/*"
-                        style={{ display: "none" }}
+                        style={{ display: "none", marginTop: "5px" }}
                         onChange={handleImageSelect}
                         disabled={!selectedGroup}
                       />
@@ -396,6 +434,7 @@ const Feed = () => {
                           borderRadius: "25px",
                           padding: "8px 20px",
                           fontWeight: "600",
+                          marginTop: "5px",
                         }}
                       >
                         Publicar
@@ -424,7 +463,7 @@ const Feed = () => {
               </Card>
 
               {/* Lista de posts */}
-              {posts.slice(0, visibleCount).map((post) => (
+              {posts.map((post) => (
                 <Card
                   key={post.postId}
                   className="mb-4"
@@ -576,7 +615,7 @@ const Feed = () => {
               ))}
 
               {/* 🔹 Botão "Carregar mais" */}
-              {visibleCount < posts.length && (
+              {selectedGroup && showButton && (
                 <div className="text-center mt-3">
                   <Button
                     variant="light"
@@ -586,7 +625,7 @@ const Feed = () => {
                       padding: "6px 18px",
                       fontWeight: "600",
                     }}
-                    onClick={() => setVisibleCount(visibleCount + 5)}
+                    onClick={() => fetchPosts(currentPage + 1)}
                   >
                     Carregar mais
                   </Button>

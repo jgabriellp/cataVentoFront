@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import Home from "./routes/Home.jsx";
 import Login from "./routes/Login.jsx";
 import Feed from "./routes/Feed.jsx";
+import Groups from "./routes/Groups.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 
 const router = createBrowserRouter([
@@ -25,6 +26,13 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Feed />
+          </PrivateRoute>
+        ),
+      },{
+        path: "/grupos",
+        element: (
+          <PrivateRoute>
+            <Groups />
           </PrivateRoute>
         ),
       },
