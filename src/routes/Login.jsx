@@ -2,45 +2,47 @@ import React from "react";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api.js";
-import axios from 'axios';
+import axios from "axios";
 
 const Login = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
 
-    const handleLogin = async (event) => {
-        event.preventDefault();
-        
-        const email = event.target.formEmail.value;
-        const password = event.target.formPassword.value;
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setLoading(true);
 
-        try {
-            const response = await api.post('/api/AuthLogin/Login', {
-                email,
-                password
-            });
+    const email = event.target.formEmail.value;
+    const password = event.target.formPassword.value;
 
-            const token = response.data.token;
-            const user = {
-                id: response.data.id,
-                name: response.data.name,
-                email: response.data.email,
-                photo: response.data.photoUrl,
-                role: response.data.role
-            }
-            console.log("Token recebido:", token);
-            console.log("Usuário recebido:", user);
+    try {
+      const response = await api.post("/api/AuthLogin/Login", {
+        email,
+        password,
+      });
 
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(user));
+      const token = response.data.token;
+      const user = {
+        id: response.data.id,
+        name: response.data.name,
+        email: response.data.email,
+        photo: response.data.photoUrl,
+        role: response.data.role,
+      };
+      console.log("Token recebido:", token);
+      console.log("Usuário recebido:", user);
 
-            navigate("/relatos");
-            // console.log("Login bem-sucedido!");
-        } catch (error) {
-            alert("Email ou senha inválidos.");
-            console.error(error);
-        }
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
+      navigate("/relatos");
+    } catch (error) {
+      alert("Email ou senha inválidos.");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  };
 
   return (
     <>
@@ -109,6 +111,7 @@ const Login = () => {
 
                     <Button
                       type="submit"
+                      disabled={loading}
                       style={{
                         backgroundColor: "#04b1b7",
                         border: "none",
@@ -116,10 +119,17 @@ const Login = () => {
                         padding: "10px 20px",
                         fontWeight: "600",
                         width: "100%",
+                        opacity: loading ? 0.7 : 1,
                       }}
-
                     >
-                      Entrar
+                      {loading ? (
+                        <div className="d-flex justify-content-center align-items-center gap-2">
+                          <span className="spinner-border spinner-border-sm"></span>
+                          Entrando...
+                        </div>
+                      ) : (
+                        "Entrar"
+                      )}
                     </Button>
 
                     {/* <p style={{ marginTop: "20px", color: "#555" }}>
@@ -137,6 +147,6 @@ const Login = () => {
       </section>
     </>
   );
-}
+};
 
 export default Login;
