@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const LoggedNavbar = () => {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.clear();
@@ -56,16 +57,31 @@ const LoggedNavbar = () => {
                 Relatos
               </Nav.Link>
 
-              <Nav.Link
-                href="/grupos"
-                style={{
-                  color: "whitesmoke",
-                  fontWeight: 500,
-                  marginRight: "15px",
-                }}
-              >
-                Grupos
-              </Nav.Link>
+              {user.role === 3 || user.role === 4 ? (
+                <Nav.Link
+                  href="/grupos"
+                  style={{
+                    color: "whitesmoke",
+                    fontWeight: 500,
+                    marginRight: "15px",
+                  }}
+                >
+                  Grupos
+                </Nav.Link>
+              ) : null}
+
+              {user.role === 3 || user.role === 4 ? (
+                <Nav.Link
+                  href="/usuarios"
+                  style={{
+                    color: "whitesmoke",
+                    fontWeight: 500,
+                    marginRight: "15px",
+                  }}
+                >
+                  Usuários
+                </Nav.Link>
+              ) : null}
 
               <Nav.Link
                 href="/perfil"
