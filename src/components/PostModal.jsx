@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import { uploadToCloudinary } from "../services/uploadToCloudinary";
+import { deleteFromCloudinary } from "../services/deleteFromCloudinary";
 import api from "../services/api";
 
 const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
@@ -30,33 +32,35 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
   }, [post, show]);
 
   // 🔹 Excluir imagem antiga no Cloudinary
-  const deleteFromCloudinary = async (url) => {
-    if (!url) return;
-    try {
-      const publicId = url.split("/").pop().split(".")[0];
-      await fetch(`https://api.cloudinary.com/v1_1/dnxt4nqp3/delete_by_token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ public_id: publicId }),
-      });
-      console.log("Imagem antiga excluída:", publicId);
-    } catch (err) {
-      console.warn("Falha ao excluir imagem antiga:", err);
-    }
-  };
+  // const deleteFromCloudinary = async (url) => {
+  //   if (!url) return;
+  //   try {
+  //     const publicId = url.split("/").pop().split(".")[0];
+  //     console.log(publicId);
 
-  // 🔹 Upload da imagem (chamado apenas no salvar)
-  const uploadToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "upload_sem_assinatura");
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dnxt4nqp3/image/upload",
-      { method: "POST", body: formData }
-    );
-    const data = await res.json();
-    return data.secure_url;
-  };
+  //     const res = await api.delete(`/api/Image`, { data: { publicId } });
+  //     if (res.status === 204) return;
+
+  //     console.log("Imagem antiga excluída:", publicId);
+  //   } catch (err) {
+  //     console.warn("Falha ao excluir imagem antiga:", err);
+  //   }
+  // };
+
+  // const uploadImageToBackend = async (file) => {
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+
+  //   const res = await api.post("/api/Image", formData, {
+  //     // Configurar o header para garantir que o Axios não tente
+  //     // serializar o FormData como JSON (415 Unsupported Media Type)
+  //     headers: {
+  //       "Content-Type": "multipart/form-data",
+  //     },
+  //   });
+
+  //   return res.data;
+  // };
 
   const handleSave = async () => {
     setLoading(true);
@@ -74,7 +78,8 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
         if (post.imageUrl) {
           await deleteFromCloudinary(post.imageUrl); // apaga antiga
         }
-        newImageUrl = await uploadToCloudinary(selectedFile); // envia nova
+        // newImageUrl = await uploadToCloudinary(selectedFile);
+        newImageUrl = await uploadToCloudinary(selectedFile);
       }
 
       // 🔹 Monta o objeto no formato que o endpoint espera
@@ -90,7 +95,6 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
       onSave(res.data);
       handleClose();
       window.location.reload();
-
     } catch (err) {
       console.error("Erro ao atualizar post:", err);
       alert("Erro ao atualizar o post.");
@@ -104,6 +108,7 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
     if (!window.confirm("Tem certeza que deseja excluir este post?")) return;
     setLoading(true);
     try {
+      await deleteFromCloudinary(post.imageUrl);
       await api.delete(`/api/Post/${post.postId}`);
       onDelete(post.postId);
       handleClose();

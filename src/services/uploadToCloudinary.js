@@ -1,19 +1,17 @@
+import api from "../services/api";
+
 export const uploadToCloudinary = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", "unsigned_preset");
 
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/dnxt4nqp3/image/upload",
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+  const res = await api.post("/api/Image", formData, {
+    // Configurar o header para garantir que o Axios não tente
+    // serializar o FormData como JSON (415 Unsupported Media Type)
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
-  const data = await res.json();
-  if (!res.ok)
-    throw new Error(data.error?.message || "Erro no upload da imagem");
-
-  return data.secure_url;
+  return res.data.secureUrl;
 };

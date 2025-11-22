@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import { uploadToCloudinary } from "../services/uploadToCloudinary";
+import { deleteFromCloudinary } from "../services/deleteFromCloudinary";
 import api from "../services/api";
 
 const EditUserModal = ({ show, onClose, user, onUpdated }) => {
@@ -53,20 +55,13 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
     try {
       // 🔹 Se uma nova foto foi anexada → fazer upload no Cloudinary
       if (userPhotoFile) {
-        const formData = new FormData();
-        formData.append("file", userPhotoFile);
-        formData.append("upload_preset", "ml_default");
+        
+        // Excluir foto antiga do Cloudinary
+        const isDeleted = await deleteFromCloudinary(user.photoUrl);
+        console.log(isDeleted);
 
-        const upload = await fetch(
-          "https://api.cloudinary.com/v1_1/dnxt4nqp3/image/upload",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-
-        const uploadedImage = await upload.json();
-        photoUrlFinal = uploadedImage.secure_url;
+        // Fazer upload da nova foto
+        photoUrlFinal = await uploadToCloudinary(userPhotoFile);
         console.log("Uploaded to Cloudinary:", photoUrlFinal);
       }
 
@@ -86,6 +81,7 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
 
       resetFields();
       onClose();
+      window.location.reload();
     } catch (err) {
       alert("Erro ao atualizar usuário.");
       console.error(err);

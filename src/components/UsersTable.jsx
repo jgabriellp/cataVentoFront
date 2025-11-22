@@ -3,6 +3,7 @@ import { Modal, Table, Button, Spinner } from "react-bootstrap";
 import ConfirmDialog from "./ConfirmDialog";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
+import { deleteFromCloudinary } from "../services/deleteFromCloudinary";
 import api from "../services/api";
 
 const UsersTable = () => {
@@ -25,6 +26,7 @@ const UsersTable = () => {
 
   const deleteUser = async () => {
     try {
+      await deleteFromCloudinary(selectedUser.photoUrl);
       await api.delete(`/api/Usuario/${selectedUser}`);
       setConfirmOpen(false);
       fetchUsers(page);
