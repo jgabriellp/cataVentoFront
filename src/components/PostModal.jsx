@@ -90,6 +90,7 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
         imageUrl: newImageUrl || "",
       };
 
+      console.log(updated.groupId);
       const res = await api.put(`/api/Post/${post.postId}`, updated);
 
       onSave(res.data);

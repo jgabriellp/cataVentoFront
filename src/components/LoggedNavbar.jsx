@@ -84,11 +84,13 @@ const LoggedNavbar = () => {
               ) : null}
 
               <Nav.Link
-                href="/perfil"
+                as="span"
+                onClick={() => navigate(`/perfil/${user.id}`)}
                 style={{
                   color: "whitesmoke",
                   fontWeight: 500,
                   marginRight: "15px",
+                  cursor: "pointer",
                 }}
               >
                 Perfil

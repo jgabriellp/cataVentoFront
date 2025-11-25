@@ -8,6 +8,7 @@ import Login from "./routes/Login.jsx";
 import Feed from "./routes/Feed.jsx";
 import Groups from "./routes/Groups.jsx";
 import Users from "./routes/Users.jsx";
+import Profile from "./routes/Profile.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 
 const router = createBrowserRouter([
@@ -43,6 +44,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Users />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/perfil/:id",
+        element: (
+          <PrivateRoute>
+            <Profile />
           </PrivateRoute>
         ),
       },

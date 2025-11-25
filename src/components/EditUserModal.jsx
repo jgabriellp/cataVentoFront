@@ -5,6 +5,8 @@ import { deleteFromCloudinary } from "../services/deleteFromCloudinary";
 import api from "../services/api";
 
 const EditUserModal = ({ show, onClose, user, onUpdated }) => {
+  const loggedUser = JSON.parse(localStorage.getItem("user"));
+
   const [userName, setUserName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -55,7 +57,6 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
     try {
       // 🔹 Se uma nova foto foi anexada → fazer upload no Cloudinary
       if (userPhotoFile) {
-        
         // Excluir foto antiga do Cloudinary
         const isDeleted = await deleteFromCloudinary(user.photoUrl);
         console.log(isDeleted);
@@ -123,33 +124,36 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
         </Form.Group>
 
         {/* Email */}
-        <Form.Group className="mb-3">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            value={userEmail}
-            onChange={(e) => setUserEmail(e.target.value)}
-          />
-        </Form.Group>
+        {loggedUser.role === 4 ? (
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+            />
+          </Form.Group>
+        ) : null}
 
         {/* Role */}
-        <Form.Group className="mb-3">
-          <Form.Label>Função (Role)</Form.Label>
-          <Form.Select
-            value={userRole}
-            onChange={(e) => setUserRole(Number(e.target.value))}
-          >
-            <option value="">Selecione...</option>
-            <option value={1}>Paciente</option>
-            <option value={2}>AT</option>
-            <option value={3}>Coordenador</option>
-            <option value={4}>Administrador</option>
-          </Form.Select>
-        </Form.Group>
+        {loggedUser.role === 4 ? (
+          <Form.Group className="mb-3">
+            <Form.Label>Função (Role)</Form.Label>
+            <Form.Select
+              value={userRole}
+              onChange={(e) => setUserRole(Number(e.target.value))}
+            >
+              <option value="">Selecione...</option>
+              <option value={1}>Paciente</option>
+              <option value={2}>AT</option>
+              <option value={3}>Coordenador</option>
+              <option value={4}>Administrador</option>
+            </Form.Select>
+          </Form.Group>
+        ) : null}
 
         {/* Foto */}
         <Form.Group className="mb-3">
-
           <Form.Control
             type="file"
             id="editFileInput"
