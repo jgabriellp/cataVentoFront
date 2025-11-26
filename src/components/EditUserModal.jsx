@@ -52,6 +52,14 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
   const handleUpdate = async () => {
     setLoading(true);
 
+    if(loggedUser.role !== 4 || loggedUser.id !== user.id) {
+      alert("Você não tem permissão para editar este usuário.");
+      setLoading(false);
+      resetFields();
+      onClose();
+      return;
+    }
+
     let photoUrlFinal = previewUrl;
 
     try {

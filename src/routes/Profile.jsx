@@ -5,14 +5,18 @@ import api from "../services/api";
 import LoggedNavbar from "../components/LoggedNavbar.jsx";
 import ProfileFeed from "../components/ProfileFeed.jsx";
 import EditUserModal from "../components/EditUserModal.jsx";
+import PasswordChangeModal from "../components/PasswordChangeModal.jsx";
 
 const Profile = () => {
+  const loggedUser = JSON.parse(localStorage.getItem("user"));
+
   const { id } = useParams(); // pega o id da URL
 
   const [user, setUser] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -89,6 +93,7 @@ const Profile = () => {
               fontWeight: "600",
               fontSize: "0.9rem",
               display: "inline-block",
+              marginRight: "10px",
             }}
             onClick={() => {
               setSelectedUser(user);
@@ -97,6 +102,26 @@ const Profile = () => {
           >
             Editar
           </Button>
+          {user.role === 4 || user.id === loggedUser.id ? (
+            <Button
+              style={{
+                background: "rgba(255,255,255,0.3)",
+                padding: "8px 18px",
+                borderRadius: "20px",
+                borderColor: "white",
+                color: "white",
+                fontWeight: "600",
+                fontSize: "0.9rem",
+                display: "inline-block",
+              }}
+              onClick={() => {
+                setSelectedUser(user);
+                setShowPasswordChangeModal(true);
+              }}
+            >
+              Atualizar a senha
+            </Button>
+          ) : null}
         </div>
         <br />
         <ProfileFeed userId={id} userPhoto={user.photoUrl} />
@@ -105,6 +130,12 @@ const Profile = () => {
         show={showProfileModal}
         user={user}
         onClose={() => setShowProfileModal(false)}
+        onUpdated={() => window.location.reload()}
+      />
+      <PasswordChangeModal
+        show={showPasswordChangeModal}
+        user={user}
+        onClose={() => setShowPasswordChangeModal(false)}
         onUpdated={() => window.location.reload()}
       />
     </>
