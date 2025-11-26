@@ -8,7 +8,8 @@ const LoggedNavbar = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    // localStorage.clear();
     navigate("/login");
   };
 

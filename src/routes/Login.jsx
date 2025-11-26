@@ -29,8 +29,8 @@ const Login = () => {
         photo: response.data.photoUrl,
         role: response.data.role,
       };
-      console.log("Token recebido:", token);
-      console.log("Usuário recebido:", user);
+      // console.log("Token recebido:", token);
+      // console.log("Usuário recebido:", user);
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));

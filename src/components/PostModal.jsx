@@ -31,58 +31,28 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
     }
   }, [post, show]);
 
-  // 🔹 Excluir imagem antiga no Cloudinary
-  // const deleteFromCloudinary = async (url) => {
-  //   if (!url) return;
-  //   try {
-  //     const publicId = url.split("/").pop().split(".")[0];
-  //     console.log(publicId);
-
-  //     const res = await api.delete(`/api/Image`, { data: { publicId } });
-  //     if (res.status === 204) return;
-
-  //     console.log("Imagem antiga excluída:", publicId);
-  //   } catch (err) {
-  //     console.warn("Falha ao excluir imagem antiga:", err);
-  //   }
-  // };
-
-  // const uploadImageToBackend = async (file) => {
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-
-  //   const res = await api.post("/api/Image", formData, {
-  //     // Configurar o header para garantir que o Axios não tente
-  //     // serializar o FormData como JSON (415 Unsupported Media Type)
-  //     headers: {
-  //       "Content-Type": "multipart/form-data",
-  //     },
-  //   });
-
-  //   return res.data;
-  // };
-
   const handleSave = async () => {
     setLoading(true);
-    try {
-      let newImageUrl = imageUrl;
 
-      // 🔹 Caso o usuário tenha removido a imagem atual
+    let oldImageUrl = post.imageUrl; // imagem original
+    let newImageUrl = imageUrl; // pode ser a mesma ou nova
+    let uploadedNewImage = false; // flag para deletar se PUT falhar
+
+    try {
+      // 🔹 Quando o usuário remove a imagem (sem enviar outra)
       if (!selectedFile && !imageUrl && post.imageUrl) {
-        await deleteFromCloudinary(post.imageUrl);
+        // Ainda não apagamos! Só apagamos depois do PUT dar certo.
         newImageUrl = "";
       }
 
-      // 🔹 Caso o usuário tenha escolhido uma nova imagem
+      // 🔹 Quando o usuário envia uma nova imagem
       if (selectedFile) {
-        if (post.imageUrl) {
-          await deleteFromCloudinary(post.imageUrl); // apaga antiga
-        }
-        // newImageUrl = await uploadToCloudinary(selectedFile);
+        // Faz upload primeiro, mas NÃO apaga a antiga ainda
         newImageUrl = await uploadToCloudinary(selectedFile);
+        uploadedNewImage = true;
       }
 
-      // 🔹 Monta o objeto no formato que o endpoint espera
+      // 🔹 Objeto atualizado
       const updated = {
         content,
         groupId: post.groupId,
@@ -90,8 +60,25 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
         imageUrl: newImageUrl || "",
       };
 
-      console.log(updated.groupId);
       const res = await api.put(`/api/Post/${post.postId}`, updated);
+
+      if (res.status !== 204) {
+        throw new Error("Erro ao atualizar post");
+      }
+
+      // --------------------------------------------------------------------
+      // PUT DEU CERTO → agora sim podemos deletar o que for necessário
+      // --------------------------------------------------------------------
+
+      // 🔹 Caso tenha removido a imagem antiga
+      if (!selectedFile && !imageUrl && oldImageUrl) {
+        await deleteFromCloudinary(oldImageUrl);
+      }
+
+      // 🔹 Caso tenha enviado uma nova imagem
+      if (selectedFile && oldImageUrl) {
+        await deleteFromCloudinary(oldImageUrl);
+      }
 
       onSave(res.data);
       handleClose();
@@ -99,6 +86,17 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
     } catch (err) {
       console.error("Erro ao atualizar post:", err);
       alert("Erro ao atualizar o post.");
+
+      // --------------------------------------------------------------------
+      // PUT FALHOU → deletar SOMENTE a nova imagem enviada
+      // --------------------------------------------------------------------
+      if (uploadedNewImage && newImageUrl) {
+        try {
+          await deleteFromCloudinary(newImageUrl);
+        } catch (deleteErr) {
+          console.error("Erro ao deletar nova imagem após falha:", deleteErr);
+        }
+      }
     } finally {
       setLoading(false);
     }

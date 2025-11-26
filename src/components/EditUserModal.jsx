@@ -58,8 +58,8 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
       // 🔹 Se uma nova foto foi anexada → fazer upload no Cloudinary
       if (userPhotoFile) {
         // Excluir foto antiga do Cloudinary
-        const isDeleted = await deleteFromCloudinary(user.photoUrl);
-        console.log(isDeleted);
+        // const isDeleted = await deleteFromCloudinary(user.photoUrl);
+        // console.log(isDeleted);
 
         // Fazer upload da nova foto
         photoUrlFinal = await uploadToCloudinary(userPhotoFile);
@@ -67,7 +67,7 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
       }
 
       // 🔹 Enviar dados atualizados para o backend
-      await api.put(`/api/Usuario/${user.id}`, {
+      const res = await api.put(`/api/Usuario/${user.id}`, {
         name: userName,
         lastName,
         role: userRole,
@@ -76,8 +76,15 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
         photoUrl: photoUrlFinal,
       });
 
-      alert("Usuário atualizado com sucesso!");
+      if (res.status !== 201 || res.status !== 204) {
+        throw new Error("Erro ao atualizar usuário");
+      }
+      // 🔹 Se uma nova foto foi anexada e o upload foi bem-sucedido → excluir a antiga
+      const isDeleted = await deleteFromCloudinary(user.photoUrl);
+      console.log(isDeleted);
 
+      alert("Usuário atualizado com sucesso!");
+      
       if (onUpdated) onUpdated();
 
       resetFields();
@@ -86,6 +93,16 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
     } catch (err) {
       alert("Erro ao atualizar usuário.");
       console.error(err);
+
+      // 🧹 4. Se falhou DEPOIS de upload → deletar imagem
+      if (photoUrlFinal) {
+        try {
+          await deleteFromCloudinary(photoUrlFinal);
+          console.log("Imagem deletada do Cloudinary.");
+        } catch (deleteErr) {
+          console.error("Erro ao deletar imagem:", deleteErr);
+        }
+      }
     }
 
     setLoading(false);

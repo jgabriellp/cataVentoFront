@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import api from "../services/api";
 import { uploadToCloudinary } from "../services/uploadToCloudinary";
+import { deleteFromCloudinary } from "../services/deleteFromCloudinary";
 
 const CreateUserModal = ({ show, onClose, onCreated }) => {
   const [userName, setUserName] = useState("");
@@ -42,14 +43,14 @@ const CreateUserModal = ({ show, onClose, onCreated }) => {
     let photoUrlFinal = null;
 
     try {
-      // Se usuário anexou uma foto → enviar agora
+      // 1. Upload da foto (se existir)
       if (userPhotoFile) {
         photoUrlFinal = await uploadToCloudinary(userPhotoFile);
         console.log("Uploaded to Cloudinary:", photoUrlFinal);
       }
 
-      // Agora você envia o novo usuário para o backend
-      await api.post("/api/Usuario", {
+      // 2. Criar o usuário
+      const res = await api.post("/api/Usuario", {
         name: userName,
         lastName: lastName,
         role: userRole,
@@ -58,13 +59,30 @@ const CreateUserModal = ({ show, onClose, onCreated }) => {
         photoUrl: photoUrlFinal,
       });
 
+      // ❗ Se der erro, forçar o catch
+      if (res.status !== 201 || res.status !== 200) {
+        throw new Error("Failed to create user");
+      }
+
+      // 3. Sucesso
       alert("Usuário criado com sucesso!");
       resetFields();
       onClose();
       window.location.reload(false);
     } catch (err) {
-      alert("Erro ao criar usuário.");
       console.error(err);
+
+      alert("Erro ao criar usuário.");
+
+      // 🧹 4. Se falhou DEPOIS de upload → deletar imagem
+      if (photoUrlFinal) {
+        try {
+          await deleteFromCloudinary(photoUrlFinal);
+          console.log("Imagem deletada do Cloudinary.");
+        } catch (deleteErr) {
+          console.error("Erro ao deletar imagem:", deleteErr);
+        }
+      }
     }
 
     setLoading(false);
