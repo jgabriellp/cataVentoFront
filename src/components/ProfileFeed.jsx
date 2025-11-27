@@ -227,16 +227,18 @@ const ProfileFeed = ({ userId, userPhoto }) => {
                     {post.date}
                   </span>
 
-                  <MoreVertical
-                    size={20}
-                    style={{
-                      cursor: "pointer",
-                      color: "#666",
-                      marginTop: "auto",
-                      marginBottom: "auto",
-                    }}
-                    onClick={() => handleOpenModal(post)}
-                  />
+                  {loggedUser.id === post.creatorId && (
+                    <MoreVertical
+                      size={20}
+                      style={{
+                        cursor: "pointer",
+                        color: "#666",
+                        marginTop: "auto",
+                        marginBottom: "auto",
+                      }}
+                      onClick={() => handleOpenModal(post)}
+                    />
+                  )}
                 </div>
 
                 {/* Conteúdo */}

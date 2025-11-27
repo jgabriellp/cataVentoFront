@@ -83,26 +83,31 @@ const Profile = () => {
             {["", "Paciente", "AT", "Coordenador", "Administrador"][user.role]}
           </span>
 
-          <Button
-            style={{
-              background: "rgba(255,255,255,0.3)",
-              padding: "8px 18px",
-              borderRadius: "20px",
-              borderColor: "white",
-              color: "white",
-              fontWeight: "600",
-              fontSize: "0.9rem",
-              display: "inline-block",
-              marginRight: "10px",
-            }}
-            onClick={() => {
-              setSelectedUser(user);
-              setShowProfileModal(true);
-            }}
-          >
-            Editar
-          </Button>
-          {user.role === 4 || user.id === loggedUser.id ? (
+          {Number(loggedUser.role) === 4 ||
+          Number(user.id) === Number(loggedUser.id) ? (
+            <Button
+              style={{
+                background: "rgba(255,255,255,0.3)",
+                padding: "8px 18px",
+                borderRadius: "20px",
+                borderColor: "white",
+                color: "white",
+                fontWeight: "600",
+                fontSize: "0.9rem",
+                display: "inline-block",
+                marginRight: "10px",
+              }}
+              onClick={() => {
+                setSelectedUser(user);
+                setShowProfileModal(true);
+              }}
+            >
+              Editar
+            </Button>
+          ) : null}
+
+          {Number(loggedUser.role) === 4 ||
+          Number(user.id) === Number(loggedUser.id) ? (
             <Button
               style={{
                 background: "rgba(255,255,255,0.3)",
@@ -115,7 +120,6 @@ const Profile = () => {
                 display: "inline-block",
               }}
               onClick={() => {
-                setSelectedUser(user);
                 setShowPasswordChangeModal(true);
               }}
             >
@@ -123,7 +127,9 @@ const Profile = () => {
             </Button>
           ) : null}
         </div>
+
         <br />
+
         <ProfileFeed userId={id} userPhoto={user.photoUrl} />
       </section>
       <EditUserModal
@@ -134,9 +140,8 @@ const Profile = () => {
       />
       <PasswordChangeModal
         show={showPasswordChangeModal}
-        user={user}
+        user={loggedUser}
         onClose={() => setShowPasswordChangeModal(false)}
-        onUpdated={() => window.location.reload()}
       />
     </>
   );

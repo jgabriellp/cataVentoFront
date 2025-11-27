@@ -52,7 +52,8 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
   const handleUpdate = async () => {
     setLoading(true);
 
-    if(loggedUser.role !== 4 || loggedUser.id !== user.id) {
+    if(loggedUser.role !== 4 && loggedUser.id !== user.id) {
+      
       alert("Você não tem permissão para editar este usuário.");
       setLoading(false);
       resetFields();
@@ -84,7 +85,7 @@ const EditUserModal = ({ show, onClose, user, onUpdated }) => {
         photoUrl: photoUrlFinal,
       });
 
-      if (res.status !== 201 || res.status !== 204) {
+      if (res.status !== 204) {
         throw new Error("Erro ao atualizar usuário");
       }
       // 🔹 Se uma nova foto foi anexada e o upload foi bem-sucedido → excluir a antiga

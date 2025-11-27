@@ -8,6 +8,7 @@ const CreateUserModal = ({ show, onClose, onCreated }) => {
   const [userName, setUserName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [userPassword, setUserPassword] = useState("");
   const [userPhotoUrl, setUserPhotoUrl] = useState("");
   const [userRole, setUserRole] = useState("");
   const [userPhotoFile, setUserPhotoFile] = useState(null);
@@ -55,12 +56,12 @@ const CreateUserModal = ({ show, onClose, onCreated }) => {
         lastName: lastName,
         role: userRole,
         email: userEmail,
-        password: "",
+        password: userPassword,
         photoUrl: photoUrlFinal,
       });
 
       // ❗ Se der erro, forçar o catch
-      if (res.status !== 201 || res.status !== 200) {
+      if (res.status !== 201) {
         throw new Error("Failed to create user");
       }
 
@@ -136,6 +137,16 @@ const CreateUserModal = ({ show, onClose, onCreated }) => {
             placeholder="exemplo@email.com"
             value={userEmail}
             onChange={(e) => setUserEmail(e.target.value)}
+          />
+        </Form.Group>
+
+        {/* Password */}
+        <Form.Group className="mb-3">
+          <Form.Label>Senha</Form.Label>
+          <Form.Control
+            type="password"
+            value={userPassword}
+            onChange={(e) => setUserPassword(e.target.value)}
           />
         </Form.Group>
 

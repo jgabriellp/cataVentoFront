@@ -12,7 +12,8 @@ import {
 } from "react-bootstrap";
 
 const Home = () => {
-  
+  const loggedUser = JSON.parse(localStorage.getItem("user"));
+
   const navigate = useNavigate();
 
   return (
@@ -97,19 +98,37 @@ const Home = () => {
                 </Nav.Link>
               ))}
 
-              <Button
-                variant="light"
-                style={{
-                  color: "#04b1b7",
-                  fontWeight: 600,
-                  borderRadius: "25px",
-                  padding: "6px 18px",
-                  border: "none",
-                }}
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </Button>
+              {!loggedUser ? (
+                <Button
+                  variant="light"
+                  style={{
+                    color: "#04b1b7",
+                    fontWeight: 600,
+                    borderRadius: "25px",
+                    padding: "6px 18px",
+                    border: "none",
+                  }}
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </Button>
+              ) : null}
+              
+              {loggedUser ? (
+                <Button
+                  variant="light"
+                  style={{
+                    color: "#04b1b7",
+                    fontWeight: 600,
+                    borderRadius: "25px",
+                    padding: "6px 18px",
+                    border: "none",
+                  }}
+                  onClick={() => navigate("/relatos")}
+                >
+                  Relatos
+                </Button>
+              ) : null}
             </Nav>
           </Navbar.Collapse>
         </Container>

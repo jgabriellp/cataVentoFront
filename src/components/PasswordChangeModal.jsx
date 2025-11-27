@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import api from "../services/api";
 
-const PasswordChangeModal = ({ show, onClose, user, onUpdated }) => {
+const PasswordChangeModal = ({ show, onClose, user }) => {
+
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
@@ -17,6 +19,28 @@ const PasswordChangeModal = ({ show, onClose, user, onUpdated }) => {
     onClose();
   };
 
+  const handleUpdate = async () => {
+    setLoading(true);
+    try {
+      const response = await api.put(`/api/Usuario/update-password/${user.id}`, {
+        oldPassword,
+        newPassword,
+      });
+
+      if (response.status !== 204) {
+        throw new Error("Falha ao mudar a senha");
+      }
+
+    } catch (error) {
+      console.error("Erro ao mudar a senha:", error);
+      alert("Erro ao mudar a senha. Por favor, tente novamente.");
+    } finally {
+      setLoading(false);
+      resetFields();
+      onClose();
+    }
+  }
+
   return (
     <Modal show={show} onHide={closeAndReset} centered size="lg">
       <Modal.Header closeButton>
@@ -28,7 +52,7 @@ const PasswordChangeModal = ({ show, onClose, user, onUpdated }) => {
         <Form.Group className="mb-3">
           <Form.Label>Senha Atual</Form.Label>
           <Form.Control
-            type="text"
+            type="password"
             value={oldPassword}
             onChange={(e) => setOldPassword(e.target.value)}
           />
@@ -38,7 +62,7 @@ const PasswordChangeModal = ({ show, onClose, user, onUpdated }) => {
         <Form.Group className="mb-3">
           <Form.Label>Nova Senha</Form.Label>
           <Form.Control
-            type="text"
+            type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
@@ -67,7 +91,7 @@ const PasswordChangeModal = ({ show, onClose, user, onUpdated }) => {
             e.target.style.background = "#04b1b7";
             e.target.style.borderColor = "#04b1b7";
           }}
-          // onClick={handleUpdate}
+          onClick={handleUpdate}
         >
           {loading ? <Spinner size="sm" /> : "Salvar Alterações"}
         </Button>
