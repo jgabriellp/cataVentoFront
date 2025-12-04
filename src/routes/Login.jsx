@@ -66,16 +66,29 @@ const Login = () => {
                 }}
               >
                 <Card.Body className="p-5 text-center">
-                  <h3
+                  {/* <h3
                     style={{
                       color: "#04b1b7",
                       marginBottom: "20px",
                       fontWeight: "600",
                     }}
                   >
-                    Bem-vindo de volta
-                  </h3>
-                  <p style={{ color: "#666", marginBottom: "30px" }}>
+                    Sistema Instituto Cata-vento SE
+                  </h3> */}
+                  <img
+                    src="https://res.cloudinary.com/dnxt4nqp3/image/upload/v1762260156/ctvse_s8g67k.png"
+                    alt="Foto"
+                    style={{
+                      width: "190px",
+                      height: "190px",
+                      objectFit: "cover",
+                      borderRadius: "50%",
+                      border: "3px solid white",
+                      marginBottom: "15px",
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                    }}
+                  />
+                  <p style={{ color: "#04b1b7", marginBottom: "30px" }}>
                     Faça login para acessar sua conta
                   </p>
                   <Form onSubmit={handleLogin}>
