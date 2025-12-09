@@ -288,7 +288,7 @@ const Feed = () => {
                 className="text-center mb-4"
                 style={{ color: "white", fontWeight: "600" }}
               >
-                Feed de Atualizações
+                Relatos
               </h2>
 
               {/* Seleção de grupo */}

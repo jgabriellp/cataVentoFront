@@ -1,11 +1,18 @@
 import api from "../services/api";
+import { compressImage } from "../services/compressImage";
 
 export const uploadToCloudinary = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", "unsigned_preset");
+  let fileToUpload = file;
 
-  const res = await api.post("/api/Image", formData, {
+  if (file.size > 70 * 1024) {
+    fileToUpload = await compressImage(file, 70);
+  }
+
+  const formData = new FormData();
+  formData.append("File", fileToUpload);
+  // formData.append("upload_preset", "unsigned_preset");
+
+  const res = await api.post("/api/Image/upload", formData, {
     // Configurar o header para garantir que o Axios não tente
     // serializar o FormData como JSON (415 Unsupported Media Type)
     headers: {
@@ -13,5 +20,5 @@ export const uploadToCloudinary = async (file) => {
     },
   });
 
-  return res.data.secureUrl;
+  return res.data.imageUrl;
 };

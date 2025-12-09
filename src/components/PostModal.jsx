@@ -43,6 +43,7 @@ const PostModal = ({ show, handleClose, post, onSave, onDelete }) => {
       if (!selectedFile && !imageUrl && post.imageUrl) {
         // Ainda não apagamos! Só apagamos depois do PUT dar certo.
         newImageUrl = "";
+        // console.log(post.imageUrl)
       }
 
       // 🔹 Quando o usuário envia uma nova imagem
