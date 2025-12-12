@@ -19,15 +19,15 @@ const UsersTable = () => {
   const [page, setPage] = useState(1);
   const pageSize = 5;
 
-  const handleDeleteClick = (id) => {
-    setSelectedUser(id);
+  const handleDeleteClick = (user) => {
+    setSelectedUser(user);
     setConfirmOpen(true);
   };
 
   const deleteUser = async () => {
     try {
       await deleteFromCloudinary(selectedUser.photoUrl);
-      await api.delete(`/api/Usuario/${selectedUser}`);
+      await api.delete(`/api/Usuario/${selectedUser.id}`);
       setConfirmOpen(false);
       fetchUsers(page);
     } catch (err) {
@@ -151,7 +151,7 @@ const UsersTable = () => {
                       variant="danger"
                       size="sm"
                       style={{ fontWeight: "500" }}
-                      onClick={() => handleDeleteClick(u.id)}
+                      onClick={() => handleDeleteClick(u)}
                     >
                       Excluir
                     </Button>
@@ -199,8 +199,8 @@ const UsersTable = () => {
         show={confirmOpen}
         title="Excluir usuário"
         message={`Tem certeza que deseja excluir o usuário?`}
-        onCancel={() => setConfirmOpen(false)}
         onConfirm={deleteUser}
+        onCancel={() => setConfirmOpen(false)}
       />
       <CreateUserModal
         show={showCreateModal}
