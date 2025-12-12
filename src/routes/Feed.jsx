@@ -170,6 +170,7 @@ const Feed = () => {
               date: new Date(post.date).toLocaleDateString("pt-BR"),
               groupName: groupRes.data.groupName,
               authorName: creatorRes.data.name || "Usuário desconhecido",
+              authorPhotoUrl: creatorRes.data.photoUrl,
               imageUrl: post.imageUrl,
               creatorId: post.creatorId,
               groupId: post.groupId,
@@ -462,7 +463,7 @@ const Feed = () => {
                       }}
                     >
                       <img
-                        src={user.photo || "/default-profile.png"}
+                        src={post.authorPhotoUrl || "/default-profile.png"}
                         alt="Logo"
                         style={{
                           width: "45px",
