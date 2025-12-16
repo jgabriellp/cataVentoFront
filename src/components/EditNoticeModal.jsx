@@ -126,6 +126,32 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
     }
   };
 
+  // Adicione dentro do componente EditNoticeModal, antes do return:
+
+  const handleDeleteNotice = async () => {
+    if (!window.confirm("Tem certeza que deseja excluir este aviso?")) return;
+
+    setLoading(true);
+    try {
+      // Deleta a imagem do Cloudinary se existir
+      if (notice.photoUrl) {
+        await deleteFromCloudinary(notice.photoUrl);
+      }
+
+      // Deleta o aviso no backend
+      await api.delete(`/api/Notice/${notice.noticeId}`);
+
+      alert("Aviso excluído com sucesso!");
+      onUpdated && onUpdated();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao excluir aviso.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const closeAndReset = () => {
     setTitle("");
     setContent("");
@@ -226,6 +252,21 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
             Limpar Foto
           </Button>
         )}
+
+        <Button
+          variant="danger"
+          onClick={handleDeleteNotice}
+          disabled={loading}
+          style={{
+            borderRadius: "25px",
+            padding: "6px 20px",
+            fontWeight: "500",
+            marginRight: "10px",
+          }}
+        >
+          {loading ? <Spinner size="sm" /> : "Excluir Aviso"}
+        </Button>
+        
         <Button variant="secondary" onClick={closeAndReset} disabled={loading}>
           Cancelar
         </Button>

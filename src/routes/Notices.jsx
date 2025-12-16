@@ -16,6 +16,8 @@ import EditNoticeModal from "../components/EditNoticeModal";
 import CreateNoticeModal from "../components/CreateNoticeModal"; // Novo modal
 
 const Notices = () => {
+  const loggedUser = JSON.parse(localStorage.getItem("user"));
+
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
@@ -292,6 +294,7 @@ const Notices = () => {
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreated={() => fetchNotices(1)}
+        creatorId={loggedUser.id}
       />
     </>
   );
