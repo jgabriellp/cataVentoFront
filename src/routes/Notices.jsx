@@ -13,14 +13,18 @@ import { MoreVertical } from "lucide-react";
 import LoggedNavbar from "../components/LoggedNavbar";
 import api from "../services/api";
 import EditNoticeModal from "../components/EditNoticeModal";
+import CreateNoticeModal from "../components/CreateNoticeModal"; // Novo modal
 
 const Notices = () => {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
   const [showButton, setShowButton] = useState(true);
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedNotice, setSelectedNotice] = useState(null);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const pageSize = 5;
 
@@ -134,12 +138,20 @@ const Notices = () => {
         <Container>
           <Row className="justify-content-center">
             <Col md={8} lg={6}>
-              <h2
-                className="text-center mb-4"
-                style={{ color: "white", fontWeight: "600" }}
-              >
-                Avisos
-              </h2>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 style={{ color: "white", fontWeight: "600" }}>Avisos</h2>
+                <Button
+                  style={{
+                    backgroundColor: "#04b1b7",
+                    borderColor: "#04b1b7",
+                    borderRadius: "25px",
+                    fontWeight: "600",
+                  }}
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  Novo Aviso
+                </Button>
+              </div>
 
               {loading && pageNumber === 1 ? (
                 <div className="text-center py-4">
@@ -273,6 +285,13 @@ const Notices = () => {
         onClose={() => setShowEditModal(false)}
         notice={selectedNotice}
         onUpdated={() => fetchNotices(1)}
+      />
+
+      {/* Modal de criação de aviso */}
+      <CreateNoticeModal
+        show={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={() => fetchNotices(1)}
       />
     </>
   );

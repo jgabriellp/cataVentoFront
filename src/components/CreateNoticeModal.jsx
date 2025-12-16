@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
-import api from "../services/api";
 import { uploadToCloudinary } from "../services/uploadToCloudinary";
-import { deleteFromCloudinary } from "../services/deleteFromCloudinary";
+import api from "../services/api";
 
 const roles = [
   { id: 1, label: "Paciente" },
@@ -11,49 +10,15 @@ const roles = [
   { id: 4, label: "Administrador" },
 ];
 
-const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
+const CreateNoticeModal = ({ show, onClose, onCreated, creatorId }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isActive, setIsActive] = useState(true);
 
-  const [imageUrl, setImageUrl] = useState("");
-  const [preview, setPreview] = useState("");
+  const [selectedRoles, setSelectedRoles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-
-  const [selectedRoles, setSelectedRoles] = useState([]); // para checkboxes
-
+  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Carregar dados do notice
-  useEffect(() => {
-    if (notice && show) {
-      setTitle(notice.title || "");
-      setContent(notice.content || "");
-      setIsActive(notice.isActive);
-      setImageUrl(notice.photoUrl || "");
-      setPreview("");
-      setSelectedFile(null);
-
-      // popula os públicos selecionados
-      const rolesIds = notice.audiences?.map((a) => a.audienceRole) || [];
-      setSelectedRoles(rolesIds);
-    }
-  }, [notice, show]);
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setSelectedFile(file);
-    setPreview(URL.createObjectURL(file));
-  };
-
-  const handleClearImage = () => {
-    setPreview("");
-    setImageUrl("");
-    setSelectedFile(null);
-    const fileInput = document.getElementById("editNoticeFileInput");
-    if (fileInput) fileInput.value = "";
-  };
 
   const toggleRole = (roleId) => {
     setSelectedRoles((prev) =>
@@ -63,7 +28,25 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
     );
   };
 
-  const handleUpdate = async () => {
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleClearImage = () => {
+    setSelectedFile(null);
+    setPreview("");
+    const fileInput = document.getElementById("createNoticeFileInput");
+    if (fileInput) fileInput.value = "";
+  };
+
+  const handleCreate = async () => {
+    if (!title || !content) {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
     if (selectedRoles.length === 0) {
       alert("Selecione pelo menos um público.");
       return;
@@ -71,76 +54,49 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
 
     setLoading(true);
 
-    const oldImageUrl = notice.photoUrl;
-    let newImageUrl = imageUrl;
-    let uploadedNewImage = false;
-
+    let photoUrlFinal = "";
     try {
-      if (!selectedFile && !imageUrl && oldImageUrl) {
-        newImageUrl = "";
-      }
-
       if (selectedFile) {
-        newImageUrl = await uploadToCloudinary(selectedFile);
-        uploadedNewImage = true;
+        photoUrlFinal = await uploadToCloudinary(selectedFile);
       }
 
-      // monta o objeto para PUT
-      const updatedNotice = {
-        noticeId: notice.noticeId,
+      const newNotice = {
         title,
         content,
         isActive,
-        photoUrl: newImageUrl,
-        dateCreated: notice.dateCreated,
-        creatorId: notice.creatorId,
+        photoUrl: photoUrlFinal,
+        dateCreated: new Date().toISOString(),
+        creatorId,
         audiences: selectedRoles.map((roleId) => ({ audienceRole: roleId })),
       };
 
-      await api.put(`/api/Notice/${notice.noticeId}`, updatedNotice);
+      const res = await api.post("/api/Notice", newNotice);
 
-      // deletar imagens antigas se necessário
-      if (!selectedFile && !imageUrl && oldImageUrl) {
-        await deleteFromCloudinary(oldImageUrl);
-      }
-      if (selectedFile && oldImageUrl) {
-        await deleteFromCloudinary(oldImageUrl);
+      if (res.status !== 201 && res.status !== 200) {
+        throw new Error("Erro ao criar aviso.");
       }
 
-      alert("Aviso atualizado com sucesso!");
-      onUpdated && onUpdated();
+      alert("Aviso criado com sucesso!");
+      setTitle("");
+      setContent("");
+      setSelectedRoles([]);
+      handleClearImage();
+      setIsActive(true);
+
       onClose();
+      if (onCreated) onCreated();
     } catch (err) {
       console.error(err);
-      alert("Erro ao atualizar aviso.");
-
-      if (uploadedNewImage && newImageUrl) {
-        try {
-          await deleteFromCloudinary(newImageUrl);
-        } catch (deleteErr) {
-          console.error("Erro ao deletar nova imagem após falha:", deleteErr);
-        }
-      }
+      alert("Erro ao criar aviso.");
     } finally {
       setLoading(false);
     }
   };
 
-  const closeAndReset = () => {
-    setTitle("");
-    setContent("");
-    setIsActive(true);
-    setImageUrl("");
-    setPreview("");
-    setSelectedFile(null);
-    setSelectedRoles([]);
-    onClose();
-  };
-
   return (
-    <Modal show={show} onHide={closeAndReset} centered size="lg">
+    <Modal show={show} onHide={onClose} centered size="lg">
       <Modal.Header closeButton>
-        <Modal.Title style={{ color: "#04b1b7" }}>Editar Aviso</Modal.Title>
+        <Modal.Title style={{ color: "#04b1b7" }}>Novo Aviso</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -192,16 +148,16 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
           <div className="d-flex gap-2 mb-2">
             <Form.Control
               type="file"
-              id="editNoticeFileInput"
               accept="image/*"
+              id="createNoticeFileInput"
               onChange={handleFileSelect}
               style={{ borderRadius: "12px" }}
             />
           </div>
-          {(preview || imageUrl) && (
+          {(preview || selectedFile) && (
             <div className="text-center mt-2">
               <img
-                src={preview || imageUrl}
+                src={preview}
                 alt="preview"
                 style={{ maxWidth: "100%", borderRadius: "10px" }}
               />
@@ -211,7 +167,7 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
       </Modal.Body>
 
       <Modal.Footer>
-        {(preview || imageUrl) && (
+        {(preview || selectedFile) && (
           <Button
             variant="light"
             style={{
@@ -226,11 +182,12 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
             Limpar Foto
           </Button>
         )}
-        <Button variant="secondary" onClick={closeAndReset} disabled={loading}>
+
+        <Button variant="secondary" onClick={onClose} disabled={loading}>
           Cancelar
         </Button>
         <Button
-          onClick={handleUpdate}
+          onClick={handleCreate}
           disabled={loading}
           style={{
             fontWeight: "500",
@@ -239,11 +196,11 @@ const EditNoticeModal = ({ show, onClose, notice, onUpdated }) => {
             borderColor: "#04b1b7",
           }}
         >
-          {loading ? <Spinner size="sm" /> : "Salvar Alterações"}
+          {loading ? <Spinner size="sm" /> : "Criar Aviso"}
         </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default EditNoticeModal;
+export default CreateNoticeModal;
