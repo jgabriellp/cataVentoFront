@@ -9,6 +9,7 @@ import Feed from "./routes/Feed.jsx";
 import Groups from "./routes/Groups.jsx";
 import Users from "./routes/Users.jsx";
 import Profile from "./routes/Profile.jsx";
+import Notices from "./routes/Notices.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 
 const router = createBrowserRouter([
@@ -52,6 +53,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Profile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/avisos",
+        element: (
+          <PrivateRoute>
+            <Notices />
           </PrivateRoute>
         ),
       },

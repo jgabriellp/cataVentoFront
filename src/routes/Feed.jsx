@@ -12,6 +12,7 @@ import LoggedNavbar from "../components/LoggedNavbar.jsx";
 import PostModal from "../components/PostModal";
 import CommentModal from "../components/CommentModal.jsx";
 import LikesModal from "../components/LikesModal.jsx";
+import NoticeModal from "../components/NoticeModal.jsx";
 import { MoreVertical } from "lucide-react";
 import { uploadToCloudinary } from "../services/uploadToCloudinary.js";
 import api from "../services/api.js";
@@ -19,6 +20,8 @@ import api from "../services/api.js";
 const Feed = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
+  const [noticeModalOpen, setNoticeModalOpen] = useState(false);
+  const [filteredNotices, setFilteredNotices] = useState([]);
   const [novoPost, setNovoPost] = useState("");
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
@@ -138,6 +141,35 @@ const Feed = () => {
   const handleDeletePost = (id) => {
     setPosts((prev) => prev.filter((p) => p.postId !== id));
   };
+
+  /* =======================
+     AVISOS (MODAL)
+  ======================= */
+  useEffect(() => {
+    const fetchActiveNotices = async () => {
+      try {
+        const response = await api.get(
+          `/api/Notice/active?pageNumber=1&pageSize=50`
+        );
+
+        const activeNotices = response.data || [];
+
+        // filtra avisos pelo role do usuário
+        const noticesByRole = activeNotices.filter((notice) =>
+          notice.audiences?.some((aud) => aud.audienceRole === user.role)
+        );
+
+        if (noticesByRole.length > 0) {
+          setFilteredNotices(noticesByRole);
+          setNoticeModalOpen(true);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar avisos:", err);
+      }
+    };
+
+    fetchActiveNotices();
+  }, [user.role]);
 
   // Buscar posts do grupo selecionado
   const fetchPosts = async (page = 1) => {
@@ -274,6 +306,14 @@ const Feed = () => {
   return (
     <>
       <LoggedNavbar />
+
+      {/* 🔔 MODAL DE AVISOS */}
+      <NoticeModal
+        show={noticeModalOpen}
+        notices={filteredNotices}
+        onFinish={() => setNoticeModalOpen(false)}
+      />
+
       <section
         style={{
           minHeight: "100vh",
