@@ -67,7 +67,7 @@ const NoticeModal = ({ notices = [], show, onFinish }) => {
         )}
 
         {/* Públicos */}
-        {currentNotice.audiences?.length > 0 && (
+        {/* {currentNotice.audiences?.length > 0 && (
           <div style={{ marginTop: "10px" }}>
             {currentNotice.audiences.map((aud) => (
               <Badge key={aud.noticeAudienceId} bg="info" className="me-1">
@@ -75,7 +75,7 @@ const NoticeModal = ({ notices = [], show, onFinish }) => {
               </Badge>
             ))}
           </div>
-        )}
+        )} */}
       </Modal.Body>
 
       <Modal.Footer>
