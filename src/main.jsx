@@ -11,6 +11,8 @@ import Users from "./routes/Users.jsx";
 import Profile from "./routes/Profile.jsx";
 import Notices from "./routes/Notices.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
+import Board from "./routes/Board.jsx"
+import './index.css'
 
 const router = createBrowserRouter([
   {
@@ -61,6 +63,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Notices />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/board",
+        element: (
+          <PrivateRoute>
+            <Board />
           </PrivateRoute>
         ),
       },

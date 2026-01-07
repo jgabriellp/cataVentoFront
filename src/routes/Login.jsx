@@ -86,6 +86,8 @@ const Login = () => {
                       border: "3px solid white",
                       marginBottom: "15px",
                       boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                      marginLeft: "auto",
+                      marginRight: "auto",
                     }}
                   />
                   <p style={{ color: "#04b1b7", marginBottom: "30px" }}>

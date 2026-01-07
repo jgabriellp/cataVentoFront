@@ -57,6 +57,8 @@ const Profile = () => {
               borderRadius: "50%",
               border: "3px solid white",
               marginBottom: "15px",
+              marginLeft: "auto",
+              marginRight: "auto",
               boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
             }}
           />

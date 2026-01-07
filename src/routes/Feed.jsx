@@ -191,10 +191,19 @@ const Feed = () => {
       const enrichedPosts = await Promise.all(
         postsData.map(async (post) => {
           try {
-            const [groupRes, creatorRes] = await Promise.all([
-              api.get(`/api/Group/${post.groupId}`),
-              api.get(`/api/Usuario/${post.creatorId}`),
-            ]);
+            // const [groupRes, creatorRes] = await Promise.all([
+            //   api.get(`/api/Group/${post.groupId}`),
+            //   api.get(`/api/Usuario/${post.creatorId}`),
+            // ]);
+
+            const groupRes = await api.get(`/api/Group/${post.groupId}`);
+            const creatorRes = await api
+              .get(`/api/Usuario/${post.creatorId}`)
+              .catch((err) => {
+                if (err.response?.status === 404)
+                  return { data: "Usuário desconhecido" };
+                throw err; // Se for outro erro (ex: 500), aí sim ele deve subir
+              });
 
             return {
               postId: post.postId,
