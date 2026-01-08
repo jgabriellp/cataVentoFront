@@ -198,7 +198,7 @@ const CreateTask = ({ show, onClose, onCreated, task }) => {
         {/* Busca usuário */}
         <div className="d-flex mb-3">
           <Form.Control
-            placeholder="Digite o nome para pesquisar"
+            placeholder="Digite o nome do responsável pela tarefa"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
