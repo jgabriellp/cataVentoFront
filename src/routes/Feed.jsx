@@ -41,6 +41,7 @@ const Feed = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const [showButton, setShowButton] = useState(true);
+  const [posting, setPosting] = useState(false);
 
   const textRef = useRef(null);
 
@@ -49,6 +50,12 @@ const Feed = () => {
     el.style.height = "auto"; // reseta altura
     el.style.height = el.scrollHeight + "px"; // ajusta para o conteúdo
   };
+
+  useEffect(() => {
+    if (!novoPost && textRef.current) {
+      textRef.current.style.height = "60px"; // sua altura mínima
+    }
+  }, [novoPost]);
 
   useEffect(() => {
     if (posts.length > 0) {
@@ -278,6 +285,7 @@ const Feed = () => {
     if (!novoPost.trim() || !selectedGroup) return;
 
     try {
+      setPosting(true); // 🔒 trava a tela
       setUploadingImage(true);
 
       let uploadedUrl = "";
@@ -309,6 +317,7 @@ const Feed = () => {
       alert("Ocorreu um erro ao publicar o post. Tente novamente.");
     } finally {
       setUploadingImage(false);
+      setPosting(false); // 🔓 libera a tela quando o feed já foi atualizado
     }
   };
 
@@ -410,7 +419,8 @@ const Feed = () => {
                           setNovoPost(e.target.value);
                           handleInput();
                         }}
-                        disabled={!selectedGroup}
+                        // disabled={!selectedGroup}
+                        disabled={!selectedGroup || posting}
                         ref={textRef}
                         style={{
                           borderRadius: "15px",
@@ -453,12 +463,12 @@ const Feed = () => {
                         accept="image/*"
                         style={{ display: "none", marginTop: "5px" }}
                         onChange={handleImageSelect}
-                        disabled={!selectedGroup}
+                        disabled={!selectedGroup || posting}
                       />
 
                       <Button
                         type="submit"
-                        disabled={!selectedGroup}
+                        disabled={!selectedGroup || posting}
                         style={{
                           backgroundColor: "#04b1b7",
                           border: "none",
@@ -466,9 +476,21 @@ const Feed = () => {
                           padding: "8px 20px",
                           fontWeight: "600",
                           marginTop: "5px",
+                          opacity: posting ? 0.6 : 1,
                         }}
                       >
-                        Publicar
+                        {posting ? (
+                          <>
+                            <Spinner
+                              size="sm"
+                              animation="border"
+                              className="me-2"
+                            />
+                            Publicando...
+                          </>
+                        ) : (
+                          "Publicar"
+                        )}
                       </Button>
                     </div>
 
@@ -562,7 +584,15 @@ const Feed = () => {
                         {post.groupName}
                       </p>
                     )}
-                    <p style={{ marginBottom: "5px" }}>{post.content}</p>
+                    <p
+                      style={{
+                        marginBottom: "5px",
+                        whiteSpace: "pre-wrap", // 👈 MANTÉM \n
+                        wordBreak: "break-word", // evita quebrar layout
+                      }}
+                    >
+                      {post.content}
+                    </p>
                     {post.imageUrl && (
                       <img
                         src={post.imageUrl}
@@ -665,6 +695,30 @@ const Feed = () => {
             </Col>
           </Row>
         </Container>
+        {posting && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              background: "rgba(0,0,0,0.4)",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backdropFilter: "blur(3px)",
+            }}
+          >
+            <div className="text-center text-white">
+              <Spinner animation="border" />
+              <p style={{ marginTop: "10px", fontWeight: "500" }}>
+                Publicando...
+              </p>
+            </div>
+          </div>
+        )}
       </section>
       <PostModal
         show={showModal}
