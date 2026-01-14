@@ -12,6 +12,7 @@ import Profile from "./routes/Profile.jsx";
 import Notices from "./routes/Notices.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import Board from "./routes/Board.jsx"
+import ExportPostsByDate from "./routes/ExportPostsByDate.jsx";
 import './index.css'
 
 const router = createBrowserRouter([
@@ -71,6 +72,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Board />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/export",
+        element: (
+          <PrivateRoute>
+            <ExportPostsByDate />
           </PrivateRoute>
         ),
       },
