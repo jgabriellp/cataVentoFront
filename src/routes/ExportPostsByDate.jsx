@@ -70,10 +70,13 @@ const ExportPostsByDate = () => {
     doc.text(`Período de ${startDate} a ${endDate}`, 14, 30);
 
     for (const post of posts) {
+      // const content =
+      //   post.content && post.content.length > 300
+      //     ? post.content.substring(0, 300) + "..."
+      //     : post.content || "";
+
       const content =
-        post.content && post.content.length > 300
-          ? post.content.substring(0, 300) + "..."
-          : post.content || "";
+        post.content && post.content.length > 0 ? post.content : "";
 
       const formattedDate = post.date
         ? new Date(post.date).toLocaleDateString("pt-BR")
