@@ -59,19 +59,6 @@ const LoggedNavbar = () => {
                 Relatos
               </Nav.Link>
 
-              {user.role === 3 || user.role === 4 ? (
-                <Nav.Link
-                  href="/export"
-                  style={{
-                    color: "whitesmoke",
-                    fontWeight: 500,
-                    marginRight: "15px",
-                  }}
-                >
-                  Exportação
-                </Nav.Link>
-              ) : null}
-
               <Nav.Link
                 href="/board"
                 style={{
@@ -98,19 +85,6 @@ const LoggedNavbar = () => {
 
               {user.role === 3 || user.role === 4 ? (
                 <Nav.Link
-                  href="/avisos"
-                  style={{
-                    color: "whitesmoke",
-                    fontWeight: 500,
-                    marginRight: "15px",
-                  }}
-                >
-                  Avisos
-                </Nav.Link>
-              ) : null}
-
-              {user.role === 3 || user.role === 4 ? (
-                <Nav.Link
                   href="/usuarios"
                   style={{
                     color: "whitesmoke",
@@ -119,6 +93,32 @@ const LoggedNavbar = () => {
                   }}
                 >
                   Usuários
+                </Nav.Link>
+              ) : null}
+
+              {user.role === 3 || user.role === 4 ? (
+                <Nav.Link
+                  href="/export"
+                  style={{
+                    color: "whitesmoke",
+                    fontWeight: 500,
+                    marginRight: "15px",
+                  }}
+                >
+                  Exportação
+                </Nav.Link>
+              ) : null}
+
+              {user.role === 3 || user.role === 4 ? (
+                <Nav.Link
+                  href="/avisos"
+                  style={{
+                    color: "whitesmoke",
+                    fontWeight: 500,
+                    marginRight: "15px",
+                  }}
+                >
+                  Avisos
                 </Nav.Link>
               ) : null}
 
