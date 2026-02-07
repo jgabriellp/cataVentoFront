@@ -66,9 +66,9 @@ const Users = () => {
               style={{
                 borderRadius: "25px",
                 border: "1px solid #04b1b7",
-                padding: "10px 15px",
+                padding: "10px 12px",
                 boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-                minWidth: "229px",
+                minWidth: "221px",
               }}
             />
 

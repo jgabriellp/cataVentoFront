@@ -68,7 +68,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/board",
+        path: "/tarefas",
         element: (
           <PrivateRoute>
             <Board />

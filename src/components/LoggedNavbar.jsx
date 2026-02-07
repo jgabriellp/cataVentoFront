@@ -60,14 +60,14 @@ const LoggedNavbar = () => {
               </Nav.Link>
 
               <Nav.Link
-                href="/board"
+                href="/tarefas"
                 style={{
                   color: "whitesmoke",
                   fontWeight: 500,
                   marginRight: "15px",
                 }}
               >
-                Board
+                Tarefas
               </Nav.Link>
 
               {user.role === 3 || user.role === 4 ? (
