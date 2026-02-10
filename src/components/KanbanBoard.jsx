@@ -22,9 +22,19 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 // =====================================================
+// 🔹 CARD COLORS PER STATUS
+// =====================================================
+const cardColorByStatus = {
+  1: "bg-slate-600",    // To Do
+  2: "bg-teal-600",     // In Progress
+  3: "bg-amber-600",    // Review
+  4: "bg-[#f1e6af]",  // Done
+};
+
+// =====================================================
 // 🔹 TASK CARD
 // =====================================================
-const TaskCard = ({ task, onClick, onRemove }) => {
+const TaskCard = ({ task, status, onClick, onRemove }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task.id });
 
@@ -39,7 +49,7 @@ const TaskCard = ({ task, onClick, onRemove }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-zinc-700 text-white p-3 rounded mb-3 cursor-move"
+      className={`${cardColorByStatus[status] || "bg-zinc-700"} ${status === 4 ? "text-zinc-800" : "text-white"} p-3 rounded mb-3 cursor-move`}
     >
       <div className="flex justify-between items-center">
         <span
@@ -57,7 +67,7 @@ const TaskCard = ({ task, onClick, onRemove }) => {
       </div>
 
       {task.responsavel && (
-        <small className="text-zinc-300">
+        <small className={status === 4 ? "text-zinc-600" : "text-zinc-300"}>
           Responsável: {task.responsavel.name}
         </small>
       )}
@@ -90,6 +100,7 @@ const KanbanColumn = ({ status, title, tasks, onTaskClick, onRemove }) => {
           <TaskCard
             key={task.id}
             task={task}
+            status={Number(status)}
             onClick={onTaskClick}
             onRemove={onRemove}
           />
@@ -315,12 +326,12 @@ const KanbanBoard = () => {
         {/* 🔹 OVERLAY (FLUIDEZ) */}
         <DragOverlay>
           {activeTask ? (
-            <div className="bg-zinc-700 text-white p-3 rounded shadow-lg w-72">
+            <div className={`${cardColorByStatus[activeTask.status] || "bg-zinc-700"} ${activeTask.status === 4 ? "text-zinc-800" : "text-white"} p-3 rounded shadow-lg w-72`}>
               <div className="flex justify-between items-center">
                 <span>{activeTask.title}</span>
               </div>
               {activeTask.responsavel && (
-                <small className="text-zinc-300">
+                <small className={activeTask.status === 4 ? "text-zinc-600" : "text-zinc-300"}>
                   Responsável: {activeTask.responsavel.name}
                 </small>
               )}
