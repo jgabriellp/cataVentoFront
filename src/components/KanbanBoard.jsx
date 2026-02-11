@@ -121,6 +121,7 @@ const handleRemoveClick = (task) => {
 // =====================================================
 const KanbanBoard = ({ boardType }) => {
   const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [activeTask, setActiveTask] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -168,6 +169,7 @@ const KanbanBoard = ({ boardType }) => {
   // ---------------------------------------------------
   const fetchTasks = async () => {
     try {
+      setLoading(true);
       const user = JSON.parse(localStorage.getItem("user"));
       const isAdmin = Number(user?.role) === 4;
 
@@ -182,6 +184,8 @@ const KanbanBoard = ({ boardType }) => {
       setTasks(allTasks);
     } catch (err) {
       console.error("Erro ao carregar tasks", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -298,6 +302,14 @@ const KanbanBoard = ({ boardType }) => {
   // ---------------------------------------------------
   // UI
   // ---------------------------------------------------
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center pt-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex justify-center mb-6">
