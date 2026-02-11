@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import api from "../services/api";
 
-const CreateTask = ({ show, onClose, onCreated, task }) => {
+const CreateTask = ({ show, onClose, onCreated, task, boardType }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -79,9 +79,10 @@ const CreateTask = ({ show, onClose, onCreated, task }) => {
         status: Number(status),
         priority: Number(priority),
         usuarioId: selectedUser.id,
+        boardType,
       });
 
-      onCreated(res.data); // devolve a task atualizada
+      onCreated({ ...res.data, responsavel: selectedUser }); // devolve a task atualizada
       onClose();
 
       // reset
@@ -92,7 +93,6 @@ const CreateTask = ({ show, onClose, onCreated, task }) => {
       setSelectedUser(null);
       setSearchQuery("");
       setSearchResults([]);
-      window.location.reload();
     } catch (err) {
       console.error("Erro ao atualizar task", err);
     } finally {
@@ -116,9 +116,10 @@ const CreateTask = ({ show, onClose, onCreated, task }) => {
         status: Number(status),
         priority: Number(priority),
         usuarioId: selectedUser.id,
+        boardType,
       });
 
-      onCreated(res.data); // devolve a task criada
+      onCreated({ ...res.data, responsavel: selectedUser }); // devolve a task criada
       onClose();
 
       // reset
@@ -129,7 +130,6 @@ const CreateTask = ({ show, onClose, onCreated, task }) => {
       setSelectedUser(null);
       setSearchQuery("");
       setSearchResults([]);
-      window.location.reload();
     } catch (err) {
       console.error("Erro ao criar task", err);
     } finally {

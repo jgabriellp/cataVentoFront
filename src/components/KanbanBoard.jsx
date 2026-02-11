@@ -119,7 +119,7 @@ const handleRemoveClick = (task) => {
 // =====================================================
 // 🔹 BOARD
 // =====================================================
-const KanbanBoard = () => {
+const KanbanBoard = ({ boardType }) => {
   const [tasks, setTasks] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   const [activeTask, setActiveTask] = useState(null);
@@ -168,8 +168,18 @@ const KanbanBoard = () => {
   // ---------------------------------------------------
   const fetchTasks = async () => {
     try {
-      const res = await api.get("/api/Task");
-      setTasks(res.data);
+      const user = JSON.parse(localStorage.getItem("user"));
+      const isAdmin = Number(user?.role) === 4;
+
+      const res1 = await api.get("/api/Task?boardType=1");
+      let allTasks = [...res1.data];
+
+      if (isAdmin) {
+        const res2 = await api.get("/api/Task?boardType=2");
+        allTasks = [...allTasks, ...res2.data];
+      }
+
+      setTasks(allTasks);
     } catch (err) {
       console.error("Erro ao carregar tasks", err);
     }
@@ -184,7 +194,7 @@ const KanbanBoard = () => {
   // ---------------------------------------------------
   const tasksByStatus = (status) =>
     tasks
-      .filter((t) => t.status === Number(status))
+      .filter((t) => t.status === Number(status) && t.boardType === boardType)
       .sort((a, b) => a.position - b.position);
 
   const findTask = (id) => tasks.find((t) => t.id === id);
@@ -343,11 +353,20 @@ const KanbanBoard = () => {
       <CreateTask
         show={showCreate}
         task={selectedTask}
+        boardType={boardType}
         onClose={() => {
           setShowCreate(false);
           setSelectedTask(null);
         }}
-        onCreated={(task) => setTasks((prev) => [...prev, task])}
+        onCreated={(newTask) =>
+          setTasks((prev) => {
+            const exists = prev.some((t) => t.id === newTask.id);
+            if (exists) {
+              return prev.map((t) => (t.id === newTask.id ? newTask : t));
+            }
+            return [...prev, newTask];
+          })
+        }
       />
       <ConfirmDialog
         show={showConfirm}
