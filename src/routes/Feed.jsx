@@ -42,6 +42,7 @@ const Feed = () => {
   const pageSize = 5;
   const [showButton, setShowButton] = useState(true);
   const [posting, setPosting] = useState(false);
+  const [loadingPosts, setLoadingPosts] = useState(false);
 
   const textRef = useRef(null);
 
@@ -181,6 +182,7 @@ const Feed = () => {
   // Buscar posts do grupo selecionado
   const fetchPosts = async (page = 1) => {
     if (!selectedGroup) return;
+    if (page === 1) setLoadingPosts(true);
     try {
       const response = await api.get(
         `/api/Post/group/${selectedGroup}?pageNumber=${page}&pageSize=${pageSize}`
@@ -248,6 +250,8 @@ const Feed = () => {
       setCurrentPage(page);
     } catch (error) {
       console.error("Erro ao carregar posts:", error);
+    } finally {
+      setLoadingPosts(false);
     }
   };
 
@@ -516,6 +520,15 @@ const Feed = () => {
               </Card>
 
               {/* Lista de posts */}
+              {!loadingPosts && posts.length === 0 && selectedGroup && (
+                <p
+                  className="text-center"
+                  style={{ color: "white", fontWeight: "500" }}
+                >
+                  Nenhum post encontrado neste grupo.
+                </p>
+              )}
+
               {posts.map((post) => (
                 <Card
                   key={post.postId}
@@ -695,6 +708,30 @@ const Feed = () => {
             </Col>
           </Row>
         </Container>
+        {loadingPosts && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              background: "rgba(0,0,0,0.4)",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backdropFilter: "blur(3px)",
+            }}
+          >
+            <div className="text-center text-white">
+              <Spinner animation="border" />
+              <p style={{ marginTop: "10px", fontWeight: "500" }}>
+                Carregando posts...
+              </p>
+            </div>
+          </div>
+        )}
         {posting && (
           <div
             style={{
