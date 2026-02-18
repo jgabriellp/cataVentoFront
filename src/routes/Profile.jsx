@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import api from "../services/api";
 import LoggedNavbar from "../components/LoggedNavbar.jsx";
 import ProfileFeed from "../components/ProfileFeed.jsx";
@@ -31,11 +31,35 @@ const Profile = () => {
     fetchUser();
   }, [id]);
 
-  if (!user) return <p>Carregando...</p>;
-
   return (
     <>
       <LoggedNavbar />
+      {!user && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: "blur(3px)",
+          }}
+        >
+          <div className="text-center text-white">
+            <Spinner animation="border" />
+            <p style={{ marginTop: "10px", fontWeight: "500" }}>
+              Carregando perfil...
+            </p>
+          </div>
+        </div>
+      )}
+      {user && (
+      <>
       <section
         style={{
           minHeight: "100vh",
@@ -145,6 +169,8 @@ const Profile = () => {
         user={loggedUser}
         onClose={() => setShowPasswordChangeModal(false)}
       />
+      </>
+      )}
     </>
   );
 };
