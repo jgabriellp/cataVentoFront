@@ -143,12 +143,7 @@ const Notices = () => {
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 style={{ color: "white", fontWeight: "600" }}>Avisos</h2>
                 <Button
-                  style={{
-                    backgroundColor: "#04b1b7",
-                    borderColor: "#04b1b7",
-                    borderRadius: "25px",
-                    fontWeight: "600",
-                  }}
+                  className="bg-[#04b1b7] border-[#04b1b7] rounded-[25px] font-semibold hover:bg-white hover:border-white hover:text-[#04b1b7] transition-colors"
                   onClick={() => setShowCreateModal(true)}
                 >
                   Novo Aviso
