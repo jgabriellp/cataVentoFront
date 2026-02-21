@@ -8,6 +8,7 @@ import api from "../services/api";
 
 const UsersTable = ({ searchResults }) => {
   const [users, setUsers] = useState([]);
+  const [localSearchResults, setLocalSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedUserData, setSelectedUserData] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -29,6 +30,7 @@ const UsersTable = ({ searchResults }) => {
       await deleteFromCloudinary(selectedUser.photoUrl);
       await api.delete(`/api/Usuario/${selectedUser.id}`);
       setConfirmOpen(false);
+      setLocalSearchResults((prev) => prev.filter((u) => u.id !== selectedUser.id));
       fetchUsers(page);
     } catch (err) {
       alert("Erro ao excluir usuário.");
@@ -56,14 +58,14 @@ const UsersTable = ({ searchResults }) => {
   };
 
   useEffect(() => {
+    setLocalSearchResults(searchResults || []);
     // Só busca paginado se NÃO estiver em modo busca
     if (!searchResults || searchResults.length === 0) {
       fetchUsers(1);
     }
   }, [searchResults]);
 
-  const displayedUsers =
-    searchResults && searchResults.length > 0 ? searchResults : users;
+  const displayedUsers = localSearchResults.length > 0 ? localSearchResults : users;
 
   return (
     <>
@@ -165,7 +167,7 @@ const UsersTable = ({ searchResults }) => {
         </Table>
 
         {/* Paginação só aparece quando NÃO está buscando */}
-        {(!searchResults || searchResults.length === 0) && (
+        {localSearchResults.length === 0 && (
           <div className="d-flex justify-content-between mt-3">
             <Button
               variant="light"

@@ -28,6 +28,7 @@ const GroupsTable = ({ searchResults = [] }) => {
     try {
       await api.delete(`/api/Group/${selectedGroup}`);
       setConfirmOpen(false);
+      setGroups((prev) => prev.filter((g) => g.groupId !== selectedGroup));
       fetchGroups(page);
     } catch (err) {
       alert("Erro ao excluir grupo.");
