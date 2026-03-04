@@ -184,9 +184,12 @@ const Feed = () => {
     if (!selectedGroup) return;
     if (page === 1) setLoadingPosts(true);
     try {
-      const response = await api.get(
-        `/api/Post/group/${selectedGroup}?pageNumber=${page}&pageSize=${pageSize}`
-      );
+      const endpoint =
+        user.role === 5
+          ? `/api/Post/group/${selectedGroup}/role/${user.role}?pageNumber=${page}&pageSize=${pageSize}`
+          : `/api/Post/group/${selectedGroup}?pageNumber=${page}&pageSize=${pageSize}`;
+
+      const response = await api.get(endpoint);
 
       const postsData = response.data;
 

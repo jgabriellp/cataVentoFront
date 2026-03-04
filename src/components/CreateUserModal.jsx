@@ -160,8 +160,9 @@ const CreateUserModal = ({ show, onClose, onCreated }) => {
             <option value="">Selecione...</option>
             <option value={1}>Paciente</option>
             <option value={2}>AT</option>
-            <option value={3}>Coordenador</option>
-            <option value={4}>Administrador</option>
+            <option value={3}>Coordenador(a)</option>
+            <option value={4}>Administrador(a)</option>
+            <option value={5}>Fonoaudiólogo(a)</option>
           </Form.Select>
         </Form.Group>
       </Modal.Body>

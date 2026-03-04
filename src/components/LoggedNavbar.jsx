@@ -59,16 +59,18 @@ const LoggedNavbar = () => {
                 Relatos
               </Nav.Link>
 
-              <Nav.Link
-                href="/tarefas"
-                style={{
-                  color: "whitesmoke",
-                  fontWeight: 500,
-                  marginRight: "15px",
-                }}
-              >
-                Tarefas
-              </Nav.Link>
+              {user.role !== 5 ? (
+                <Nav.Link
+                  href="/tarefas"
+                  style={{
+                    color: "whitesmoke",
+                    fontWeight: 500,
+                    marginRight: "15px",
+                  }}
+                >
+                  Tarefas
+                </Nav.Link>
+              ) : null}
 
               {user.role === 3 || user.role === 4 ? (
                 <Nav.Link

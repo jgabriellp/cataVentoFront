@@ -30,7 +30,7 @@ const Login = () => {
         role: response.data.role,
       };
       // console.log("Token recebido:", token);
-      // console.log("Usuário recebido:", user);
+      console.log("Usuário recebido:", user);
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));

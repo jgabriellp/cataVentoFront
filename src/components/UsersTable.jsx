@@ -30,7 +30,9 @@ const UsersTable = ({ searchResults }) => {
       await deleteFromCloudinary(selectedUser.photoUrl);
       await api.delete(`/api/Usuario/${selectedUser.id}`);
       setConfirmOpen(false);
-      setLocalSearchResults((prev) => prev.filter((u) => u.id !== selectedUser.id));
+      setLocalSearchResults((prev) =>
+        prev.filter((u) => u.id !== selectedUser.id),
+      );
       fetchUsers(page);
     } catch (err) {
       alert("Erro ao excluir usuário.");
@@ -41,7 +43,7 @@ const UsersTable = ({ searchResults }) => {
     setLoading(true);
     try {
       const response = await api.get(
-        `/api/Usuario?pageNumber=${pageNumber}&pageSize=${pageSize}`
+        `/api/Usuario?pageNumber=${pageNumber}&pageSize=${pageSize}`,
       );
 
       const data = response.data;
@@ -65,7 +67,8 @@ const UsersTable = ({ searchResults }) => {
     }
   }, [searchResults]);
 
-  const displayedUsers = localSearchResults.length > 0 ? localSearchResults : users;
+  const displayedUsers =
+    localSearchResults.length > 0 ? localSearchResults : users;
 
   return (
     <>
@@ -138,6 +141,7 @@ const UsersTable = ({ searchResults }) => {
                   {u.role === 2 && <td>AT</td>}
                   {u.role === 3 && <td>Coordenador</td>}
                   {u.role === 4 && <td>Administrador</td>}
+                  {u.role === 5 && <td>Fonoaudiólogo(a)</td>}
                   <td>
                     <Button
                       variant="warning"
