@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Badge } from "react-bootstrap";
+import renderContentWithLinks from "../utils/renderContentWithLinks";
 
 const NoticeModal = ({ notices = [], show, onFinish }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -51,7 +52,7 @@ const NoticeModal = ({ notices = [], show, onFinish }) => {
         </small>
 
         {/* Conteúdo */}
-        <p style={{ marginTop: "10px" }}>{currentNotice.content}</p>
+        <p style={{ marginTop: "10px" }}>{renderContentWithLinks(currentNotice.content)}</p>
 
         {/* Imagem */}
         {currentNotice.photoUrl && (

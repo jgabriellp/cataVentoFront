@@ -14,6 +14,7 @@ import LoggedNavbar from "../components/LoggedNavbar";
 import api from "../services/api";
 import EditNoticeModal from "../components/EditNoticeModal";
 import CreateNoticeModal from "../components/CreateNoticeModal"; // Novo modal
+import renderContentWithLinks from "../utils/renderContentWithLinks";
 
 const Notices = () => {
   const loggedUser = JSON.parse(localStorage.getItem("user"));
@@ -219,7 +220,7 @@ const Notices = () => {
                         </div>
 
                         {/* Conteúdo */}
-                        <p style={{ marginBottom: "10px" }}>{notice.content}</p>
+                        <p style={{ marginBottom: "10px" }}>{renderContentWithLinks(notice.content)}</p>
 
                         {/* Imagem */}
                         {notice.photoUrl && (
