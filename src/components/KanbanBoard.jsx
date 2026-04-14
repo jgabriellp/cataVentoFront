@@ -25,10 +25,10 @@ import { CSS } from "@dnd-kit/utilities";
 // 🔹 CARD COLORS PER STATUS
 // =====================================================
 const cardColorByStatus = {
-  1: "bg-slate-600",    // To Do
-  2: "bg-teal-600",     // In Progress
-  3: "bg-amber-600",    // Review
-  4: "bg-[#f1e6af]",  // Done
+  1: "bg-slate-600", // To Do
+  2: "bg-teal-600", // In Progress
+  3: "bg-amber-600", // Review
+  4: "bg-[#f1e6af]", // Done
 };
 
 // =====================================================
@@ -161,7 +161,7 @@ const KanbanBoard = ({ boardType }) => {
       activationConstraint: {
         distance: 5,
       },
-    })
+    }),
   );
 
   // ---------------------------------------------------
@@ -215,7 +215,7 @@ const KanbanBoard = ({ boardType }) => {
           id: t.id,
           status: t.status,
           position: t.position,
-        }))
+        })),
       );
     } catch (err) {
       console.error("Erro ao salvar reorder", err);
@@ -251,7 +251,7 @@ const KanbanBoard = ({ boardType }) => {
       if (fromStatus === toStatus) return;
 
       const fromTasks = tasksByStatus(fromStatus).filter(
-        (t) => t.id !== activeId
+        (t) => t.id !== activeId,
       );
 
       const toTasks = tasksByStatus(toStatus);
@@ -318,7 +318,7 @@ const KanbanBoard = ({ boardType }) => {
             setSelectedTask(null);
             setShowCreate(true);
           }}
-          className="font-medium text-[#04b1b7] border border-[#04b1b7] rounded-full px-4 py-1.5 bg-white"
+          className="font-medium bg-white text-[#04b1b7] border border-[#04b1b7] rounded-full px-4 py-1.5 hover:!bg-[#039aa0] hover:!border-[#039aa0] hover:text-white transition-colors"
         >
           Nova tarefa
         </button>
@@ -348,12 +348,18 @@ const KanbanBoard = ({ boardType }) => {
         {/* 🔹 OVERLAY (FLUIDEZ) */}
         <DragOverlay>
           {activeTask ? (
-            <div className={`${cardColorByStatus[activeTask.status] || "bg-zinc-700"} ${activeTask.status === 4 ? "text-zinc-800" : "text-white"} p-3 rounded shadow-lg w-72`}>
+            <div
+              className={`${cardColorByStatus[activeTask.status] || "bg-zinc-700"} ${activeTask.status === 4 ? "text-zinc-800" : "text-white"} p-3 rounded shadow-lg w-72`}
+            >
               <div className="flex justify-between items-center">
                 <span>{activeTask.title}</span>
               </div>
               {activeTask.responsavel && (
-                <small className={activeTask.status === 4 ? "text-zinc-600" : "text-zinc-300"}>
+                <small
+                  className={
+                    activeTask.status === 4 ? "text-zinc-600" : "text-zinc-300"
+                  }
+                >
                   Responsável: {activeTask.responsavel.name}
                 </small>
               )}
