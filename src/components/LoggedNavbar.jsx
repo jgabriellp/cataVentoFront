@@ -23,10 +23,9 @@ const NavItem = ({ href, children, isActive }) => {
       href={href}
       style={{
         ...navLinkStyle(isActive),
-        backgroundColor:
-          isActive
-            ? "rgba(255,255,255,0.2)"
-            : hovered
+        backgroundColor: isActive
+          ? "rgba(255,255,255,0.2)"
+          : hovered
             ? "rgba(255,255,255,0.12)"
             : "transparent",
       }}
@@ -150,6 +149,7 @@ const LoggedNavbar = () => {
 
               {/* Separador */}
               <div
+                className="d-none d-lg-block"
                 style={{
                   width: "1px",
                   height: "28px",
