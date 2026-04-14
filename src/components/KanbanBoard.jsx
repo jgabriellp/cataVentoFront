@@ -22,13 +22,19 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 // =====================================================
-// 🔹 CARD COLORS PER STATUS
+// 🔹 CONFIG POR STATUS E PRIORIDADE
 // =====================================================
-const cardColorByStatus = {
-  1: "bg-slate-600", // To Do
-  2: "bg-teal-600", // In Progress
-  3: "bg-amber-600", // Review
-  4: "bg-[#f1e6af]", // Done
+const columnConfig = {
+  1: { color: "#475569", label: "To Do" },
+  2: { color: "#0d9488", label: "In Progress" },
+  3: { color: "#d97706", label: "Review" },
+  4: { color: "#ca8a04", label: "Done" },
+};
+
+const priorityConfig = {
+  1: { color: "#22c55e", label: "Baixa" },
+  2: { color: "#f59e0b", label: "Média" },
+  3: { color: "#ef4444", label: "Alta" },
 };
 
 // =====================================================
@@ -38,39 +44,73 @@ const TaskCard = ({ task, status, onClick, onRemove }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task.id });
 
+  const accentColor = columnConfig[status]?.color || "#6b7280";
+  const priority = priorityConfig[task.priority];
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    background: "white",
+    borderRadius: "8px",
+    padding: "16px 18px",
+    marginBottom: "10px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+    borderLeft: `4px solid ${accentColor}`,
+    cursor: "grab",
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`${cardColorByStatus[status] || "bg-zinc-700"} ${status === 4 ? "text-zinc-800" : "text-white"} p-3 rounded mb-3 cursor-move`}
-    >
-      <div className="flex justify-between items-center">
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+
+      {/* Título + botão remover */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px", marginBottom: "12px" }}>
         <span
-          className="cursor-pointer hover:underline"
+          style={{ fontSize: "15px", fontWeight: 600, color: "#111827", lineHeight: "1.4", cursor: "pointer" }}
           onClick={() => onClick(task)}
         >
           {task.title}
         </span>
         <button
-          className="rounded-full px-2 py-1 hover:text-red-400 transition-colors"
           onClick={() => onRemove(task)}
+          style={{
+            background: "none", border: "none", color: "#d1d5db",
+            fontSize: "20px", lineHeight: 1, cursor: "pointer",
+            padding: "0 2px", flexShrink: 0,
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#d1d5db")}
         >
-          x
+          ×
         </button>
       </div>
 
-      {task.responsavel && (
-        <small className={status === 4 ? "text-zinc-600" : "text-zinc-300"}>
-          Responsável: {task.responsavel.name}
-        </small>
-      )}
+      {/* Rodapé do card: badge de prioridade + avatar */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {priority ? (
+          <span style={{
+            fontSize: "12px", fontWeight: 600, padding: "3px 10px", borderRadius: "99px",
+            background: priority.color + "18",
+            color: priority.color,
+            border: `1px solid ${priority.color}40`,
+          }}>
+            {priority.label}
+          </span>
+        ) : <span />}
+
+        {task.responsavel && (
+          <div
+            title={`${task.responsavel.name} ${task.responsavel.lastName ?? ""}`}
+            style={{
+              width: "30px", height: "30px", borderRadius: "50%",
+              background: accentColor, color: "white",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "13px", fontWeight: 700, flexShrink: 0,
+            }}
+          >
+            {task.responsavel.name?.charAt(0).toUpperCase()}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -83,14 +123,28 @@ const KanbanColumn = ({ status, title, tasks, onTaskClick, onRemove }) => {
     id: `column-${status}`,
   });
 
+  const accentColor = columnConfig[Number(status)]?.color || "#6b7280";
+
   return (
     <div
       ref={setNodeRef}
-      className="w-80 bg-zinc-100 rounded-lg p-4 min-h-[200px]"
+      className="w-80 rounded-lg p-4 min-h-[200px]"
+      style={{ background: "#f4f5f7" }}
     >
-      <h3 className="font-bold mb-4">
-        {title} ({tasks.length})
-      </h3>
+      {/* Cabeçalho da coluna */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+        <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: accentColor, flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: "15px", color: "#374151", letterSpacing: "0.02em" }}>
+          {title}
+        </span>
+        <span style={{
+          marginLeft: "auto", fontSize: "12px", fontWeight: 600,
+          background: "#e5e7eb", color: "#6b7280",
+          borderRadius: "99px", padding: "2px 10px",
+        }}>
+          {tasks.length}
+        </span>
+      </div>
 
       <SortableContext
         items={tasks.map((t) => t.id)}
@@ -349,20 +403,41 @@ const KanbanBoard = ({ boardType }) => {
         <DragOverlay>
           {activeTask ? (
             <div
-              className={`${cardColorByStatus[activeTask.status] || "bg-zinc-700"} ${activeTask.status === 4 ? "text-zinc-800" : "text-white"} p-3 rounded shadow-lg w-72`}
+              style={{
+                background: "white",
+                borderRadius: "8px",
+                padding: "12px 14px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                borderLeft: `4px solid ${columnConfig[activeTask.status]?.color || "#6b7280"}`,
+                width: "280px",
+                opacity: 0.95,
+              }}
             >
-              <div className="flex justify-between items-center">
-                <span>{activeTask.title}</span>
+              <div style={{ fontSize: "13px", fontWeight: 600, color: "#111827", marginBottom: "8px" }}>
+                {activeTask.title}
               </div>
-              {activeTask.responsavel && (
-                <small
-                  className={
-                    activeTask.status === 4 ? "text-zinc-600" : "text-zinc-300"
-                  }
-                >
-                  Responsável: {activeTask.responsavel.name}
-                </small>
-              )}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                {priorityConfig[activeTask.priority] && (
+                  <span style={{
+                    fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "99px",
+                    background: priorityConfig[activeTask.priority].color + "18",
+                    color: priorityConfig[activeTask.priority].color,
+                    border: `1px solid ${priorityConfig[activeTask.priority].color}40`,
+                  }}>
+                    {priorityConfig[activeTask.priority].label}
+                  </span>
+                )}
+                {activeTask.responsavel && (
+                  <div style={{
+                    width: "26px", height: "26px", borderRadius: "50%",
+                    background: columnConfig[activeTask.status]?.color || "#6b7280",
+                    color: "white", display: "flex", alignItems: "center",
+                    justifyContent: "center", fontSize: "11px", fontWeight: 700,
+                  }}>
+                    {activeTask.responsavel.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
             </div>
           ) : null}
         </DragOverlay>
